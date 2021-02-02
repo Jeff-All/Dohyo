@@ -1,0 +1,3 @@
+---
+  log: "logs/main.log"
+  log-level: "error"
