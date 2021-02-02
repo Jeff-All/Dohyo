@@ -1,3 +1,7 @@
 ---
   log: "logs/main.log"
   log-level: "error"
+  server:
+    address: "localhost:8000"
+    write-time-out: 3
+    read-time-out: 3

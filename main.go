@@ -4,10 +4,14 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
+	"github.com/Jeff-All/Dohyo/handlers"
 	"github.com/Jeff-All/Dohyo/helpers"
 
+	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
@@ -15,6 +19,7 @@ import (
 
 var bslog = logrus.New()
 var log = logrus.New()
+var routeHandlers = make(map[string]handlers.HandlerInterface)
 
 func main() {
 	fmt.Println("starting Dohyo")
@@ -68,6 +73,11 @@ func run(c *cli.Context) error {
 	if err := loadLog(c); err != nil {
 		bslog.Errorf("error loading log: %s", err)
 	}
+	buildHandlers()
+	router := buildRouter()
+	server := buildServer(router)
+	bslog.Info("launching server")
+	log.Fatal(server.ListenAndServe())
 	return nil
 }
 
@@ -131,6 +141,38 @@ func loadLog(c *cli.Context) error {
 	if log.Level, err = helpers.HigherLogLevel(configLevel, cliLevel); err != nil {
 		return fmt.Errorf("error determing log level: %s", err)
 	}
-	log.Info("log initialized")
+	bslog.Info("log initialized")
 	return nil
+}
+
+func buildHandlers() {
+	bslog.Info("building handlers")
+	routeHandlers["/"] = handlers.IndexHandler{
+		Handler: handlers.Handler{
+			Name:  "IndexHandler",
+			Route: "/",
+			Log:   log,
+		},
+	}
+}
+
+func buildRouter() *mux.Router {
+	bslog.Info("building router")
+	r := mux.NewRouter()
+	for key, value := range routeHandlers {
+		var name = value.GetName()
+		bslog.Infof("handling route '%s' with '%s'", key, name)
+		r.HandleFunc(key, value.ServeHTTP)
+	}
+	return r
+}
+
+func buildServer(router http.Handler) *http.Server {
+	bslog.Info("building server")
+	return &http.Server{
+		Handler:      router,
+		Addr:         viper.GetString("server.address"),
+		WriteTimeout: time.Duration(viper.GetInt("server.write-time-out")) * time.Second,
+		ReadTimeout:  time.Duration(viper.GetInt("server.read-time-out")) * time.Second,
+	}
 }
