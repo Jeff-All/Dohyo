@@ -10,6 +10,9 @@ import (
 
 	"github.com/Jeff-All/Dohyo/handlers"
 	"github.com/Jeff-All/Dohyo/helpers"
+	"github.com/Jeff-All/Dohyo/services"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -20,14 +23,14 @@ import (
 var bslog = logrus.New()
 var log = logrus.New()
 var routeHandlers = make(map[string]handlers.HandlerInterface)
+var db *gorm.DB
 
 func main() {
 	fmt.Println("starting Dohyo")
 
 	app := &cli.App{
-		Name:   "Dohyo",
-		Usage:  "Backend for Basho, the Fantasy Sumo App",
-		Action: run,
+		Name:  "Dohyo",
+		Usage: "Backend for Basho, the Fantasy Sumo App",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "config",
@@ -55,6 +58,30 @@ func main() {
 				Usage: "logging level (Error, Warn, Info, Debug)",
 			},
 		},
+		Commands: []*cli.Command{
+			{
+				Name:   "run",
+				Usage:  "run the server",
+				Action: run,
+			},
+			{
+				Name:   "load",
+				Usage:  "loads data into the database from data files",
+				Action: load,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "data-file",
+						Usage:    "data file to source the data from",
+						Required: true,
+					},
+				},
+			},
+			{
+				Name:   "migrate",
+				Usage:  "migrates the provided tables into the database",
+				Action: migrate,
+			},
+		},
 	}
 
 	fmt.Println("running Dohyo app")
@@ -64,6 +91,16 @@ func main() {
 }
 
 func run(c *cli.Context) error {
+	bootstrap(c)
+	buildHandlers()
+	router := buildRouter()
+	server := buildServer(router)
+	bslog.Info("launching server")
+	log.Fatal(server.ListenAndServe())
+	return nil
+}
+
+func bootstrap(c *cli.Context) error {
 	if err := loadBootstrapLog(c); err != nil {
 		panic(fmt.Errorf("error loading bootstrap log: %s", err))
 	}
@@ -73,11 +110,6 @@ func run(c *cli.Context) error {
 	if err := loadLog(c); err != nil {
 		bslog.Errorf("error loading log: %s", err)
 	}
-	buildHandlers()
-	router := buildRouter()
-	server := buildServer(router)
-	bslog.Info("launching server")
-	log.Fatal(server.ListenAndServe())
 	return nil
 }
 
@@ -145,6 +177,20 @@ func loadLog(c *cli.Context) error {
 	return nil
 }
 
+func loadDB() error {
+	bslog.Info("connecting to database")
+	filename := viper.GetString("db.filename")
+	if err := helpers.CreateDirectoryForFile(filename); err != nil {
+		return err
+	}
+	var err error
+	if db, err = gorm.Open(sqlite.Open(filename), &gorm.Config{}); err != nil {
+		return err
+	}
+	bslog.Info("connected to database")
+	return nil
+}
+
 func buildHandlers() {
 	bslog.Info("building handlers")
 	routeHandlers["/"] = handlers.IndexHandler{
@@ -175,4 +221,47 @@ func buildServer(router http.Handler) *http.Server {
 		WriteTimeout: time.Duration(viper.GetInt("server.write-time-out")) * time.Second,
 		ReadTimeout:  time.Duration(viper.GetInt("server.read-time-out")) * time.Second,
 	}
+}
+
+func load(c *cli.Context) error {
+	bootstrap(c)
+	if err := loadDB(); err != nil {
+		return err
+	}
+	log.Info("loading data into database")
+	dataFile := viper.New()
+	dir, name, ext := helpers.SplitFileName(c.String("data-file"))
+
+	log.WithFields(logrus.Fields{
+		"dir":  dir,
+		"name": name,
+		"ext":  ext,
+	}).Info("data file details")
+
+	dataFile.SetConfigName(name)
+	dataFile.AddConfigPath(dir)
+	dataFile.SetConfigType(ext)
+
+	if err := dataFile.ReadInConfig(); err != nil {
+		return err
+	}
+
+	service := services.NewLoadService(log, db, dataFile)
+
+	for _, arg := range c.Args().Slice() {
+		service.Load(arg)
+	}
+	return nil
+}
+
+func migrate(c *cli.Context) error {
+	bootstrap(c)
+	if err := loadDB(); err != nil {
+		return err
+	}
+	log.Info("migrating tables into database")
+
+	service := services.NewMigrationService(log, db)
+	service.MigrateModels(c.Args().Slice()...)
+	return nil
 }

@@ -36,8 +36,16 @@ func AppendOrCreateFile(filename string) (*os.File, error) {
 	} else if exists {
 		return os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, 0666)
 	}
-	os.MkdirAll(filepath.Dir(filename), os.ModeAppend)
+	if err := CreateDirectoryForFile(filename); err != nil {
+		return nil, err
+	}
 	return os.Create(filename)
+}
+
+// CreateDirectoryForFile - Creates the directory for the given file
+func CreateDirectoryForFile(filename string) error {
+	err := os.MkdirAll(filepath.Dir(filename), os.ModeAppend)
+	return err
 }
 
 // FileExists - Returns if the file exists
@@ -50,4 +58,13 @@ func FileExists(filename string) (bool, error) {
 	} else {
 		return false, err
 	}
+}
+
+// SplitFileName - Returns the directory, filename and extension in 3 seperate strings
+func SplitFileName(filename string) (string, string, string) {
+	var dir = filepath.Dir(filename)
+	var longName = filepath.Base(filename)
+	var extension = filepath.Ext(filename)
+	var shortName = strings.TrimSuffix(longName, extension)
+	return dir, shortName, extension[1:]
 }

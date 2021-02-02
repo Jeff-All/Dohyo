@@ -1,0 +1,21 @@
+---
+  test: 1
+  ranks:
+    -
+      Level: 0
+      Name: Yokozuna
+    -
+      Level: 1
+      Name: Ozeki
+    -
+      Level: 2
+      Name: Sekiwake
+    -
+      Level: 3
+      Name: Komusubi
+    -
+      Level: 4
+      Name: Maegashira
+    -
+      Level: 5
+      Name: Juryo
