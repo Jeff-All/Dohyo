@@ -14,6 +14,6 @@ func (i IndexHandler) ServeHTTP(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	i.Handler.Log.Infof("'%s' serving request on route '%s'", i.Name, i.Route)
+	i.Handler.Log.Infof("IndexHandler serving request")
 	w.Write([]byte("you have successfully connected to Dohyo"))
 }

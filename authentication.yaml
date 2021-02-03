@@ -1,0 +1,4 @@
+---
+  identifier: "https://jeffall.com/dohyo"
+  domain: "https://jefall.auth0.com/"
+  jwksOrigin: "https://jefall.auth0.com/.well-known/jwks.json"

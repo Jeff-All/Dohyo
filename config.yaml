@@ -7,3 +7,5 @@
     read-time-out: 3
   db:
     filename: databases/data.db
+  authentication:
+    config: "./authentication.yaml"
