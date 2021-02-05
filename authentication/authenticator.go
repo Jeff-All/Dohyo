@@ -3,6 +3,7 @@ package authentication
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/Jeff-All/Dohyo/helpers"
@@ -35,6 +36,11 @@ type jsonWebKeys struct {
 	X5c []string `json:"x5c"`
 }
 
+// Domain - return the current auth.domain configuration
+func Domain() string {
+	return auth.domain
+}
+
 // SetNewAuthenticator - Instantiates and sets a new Authenticator
 func SetNewAuthenticator(
 	log *logrus.Logger,
@@ -64,6 +70,7 @@ func SetNewAuthenticator(
 
 // AuthenticateJWT - Authenticates the provided JWT
 func AuthenticateJWT(token *jwt.Token) (interface{}, error) {
+	fmt.Println("AuthenticateJWT")
 	auth.log.Info("authenticating JWT")
 	checkAud := token.Claims.(jwt.MapClaims).VerifyAudience(auth.aud, false)
 	if !checkAud {

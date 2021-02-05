@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/auth0/go-jwt-middleware v1.0.0
 	github.com/form3tech-oss/jwt-go v3.2.2+incompatible
+	github.com/gorilla/context v1.1.1
 	github.com/gorilla/mux v1.8.0
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	github.com/sirupsen/logrus v1.2.0
