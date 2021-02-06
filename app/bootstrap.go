@@ -126,6 +126,12 @@ func buildHandlers() {
 		},
 	}
 
+	routeHandlers["categorizedRikishis"] = handlers.CategorizedRikishiHandler{
+		Handler: handlers.Handler{
+			Log: log,
+		},
+	}
+
 	bslog.Info("handlers built")
 }
 
