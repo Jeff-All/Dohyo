@@ -15,6 +15,10 @@ func run(c *cli.Context) error {
 	if err := buildAuthentication(); err != nil {
 		return err
 	}
+	if err := loadDB(); err != nil {
+		return err
+	}
+	buildServices()
 	buildHandlers()
 	router := buildRouter()
 	defineRoutes(router)
@@ -49,9 +53,8 @@ func load(c *cli.Context) error {
 		return err
 	}
 
-	rankService := services.NewRankService(log, db)
-	rikishiService := services.NewRikishiService(log, db, rankService)
-	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService)
+	buildServices()
+	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService, categoryService)
 
 	for _, arg := range c.Args().Slice() {
 		if err := service.Load(arg); err != nil {

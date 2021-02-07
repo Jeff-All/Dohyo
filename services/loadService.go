@@ -14,8 +14,9 @@ type LoadService struct {
 	log *logrus.Logger
 	db  *gorm.DB
 
-	rankService    RankService
-	rikishiService RikishiService
+	rankService     RankService
+	rikishiService  RikishiService
+	categoryService CategoryService
 
 	data *viper.Viper
 }
@@ -27,13 +28,15 @@ func NewLoadService(
 	data *viper.Viper,
 	rankService RankService,
 	rikishiService RikishiService,
+	categoryService CategoryService,
 ) LoadService {
 	return LoadService{
-		log:            log,
-		db:             db,
-		data:           data,
-		rankService:    rankService,
-		rikishiService: rikishiService,
+		log:             log,
+		db:              db,
+		data:            data,
+		rankService:     rankService,
+		rikishiService:  rikishiService,
+		categoryService: categoryService,
 	}
 }
 
@@ -45,6 +48,8 @@ func (s LoadService) Load(model string) error {
 		return s.LoadRanks()
 	case "rikishi":
 		return s.LoadRikishi()
+	case "category":
+		return s.LoadCategories()
 	default:
 		s.log.Errorf("invalid model '%s'", model)
 		return fmt.Errorf("invalid model '%s'", model)
@@ -74,8 +79,27 @@ func (s LoadService) LoadRikishi() error {
 	var rikishi []models.Rikishi
 	s.data.UnmarshalKey("rikishi", &rikishi)
 
-	s.rikishiService.AddRikishi(rikishi)
+	if err := s.rikishiService.AddRikishi(rikishi); err != nil {
+		s.log.Errorf("error while adding rikishi: %s", err)
+		return err
+	}
 
 	s.log.Info("loaded rikishi")
+	return nil
+}
+
+// LoadCategories - Fills the Categories tables with data from the data file
+func (s LoadService) LoadCategories() error {
+	s.log.Info("loading categories from config")
+
+	var categories []models.Category
+	s.data.UnmarshalKey("categories", &categories)
+
+	if err := s.categoryService.SetCategories(categories); err != nil {
+		s.log.Errorf("error while adding categories: %s", err)
+		return err
+	}
+
+	s.log.Info("loaded categories")
 	return nil
 }

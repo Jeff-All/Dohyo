@@ -72,7 +72,7 @@
   categories:
     -
       Name: "A"
-      RikishiNames: ["Rikishi A","Rikishi B","Rikishi C"]
+      RikishiNames: ["Rikishi A","Rikishi B", "Rikishi C"]
     -
       Name: "B"
       RikishiNames: ["Rikishi D","Rikishi E","Rikishi F"]

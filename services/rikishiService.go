@@ -1,6 +1,8 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -24,6 +26,36 @@ func NewRikishiService(
 		db:          db,
 		rankService: rankService,
 	}
+}
+
+// GetAllRikishi - Returns all rikishi in the database
+func (s *RikishiService) GetAllRikishi() ([]models.Rikishi, error) {
+	rikishis := []models.Rikishi{}
+	var result *gorm.DB
+	if result = s.db.Find(&rikishis); result.Error == nil {
+		s.log.Infof("successfully pulled all rikishi")
+		return rikishis, nil
+	} else if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		s.log.Infof("unable to find any rikishi entries")
+		return rikishis, nil
+	}
+	s.log.Errorf("error while retrieving rikishi entries: %s", result.Error)
+	return rikishis, result.Error
+}
+
+// GetRikishiMappedByName - Returns a map of all rikishi indexed by their Name column
+func (s *RikishiService) GetRikishiMappedByName() (map[string]models.Rikishi, error) {
+	var rikishis []models.Rikishi
+	var err error
+	if rikishis, err = s.GetAllRikishi(); err != nil {
+		s.log.Errorf("error while pulling rikishi: %s", err)
+		return nil, err
+	}
+	rikishiMap := make(map[string]models.Rikishi)
+	for _, rikishi := range rikishis {
+		rikishiMap[rikishi.Name] = rikishi
+	}
+	return rikishiMap, nil
 }
 
 // AddRikishi - Adds the provided rikishi to the database

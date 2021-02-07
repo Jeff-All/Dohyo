@@ -8,6 +8,7 @@ import (
 	"github.com/Jeff-All/Dohyo/authentication"
 	"github.com/Jeff-All/Dohyo/handlers"
 	"github.com/Jeff-All/Dohyo/helpers"
+	"github.com/Jeff-All/Dohyo/services"
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -18,6 +19,9 @@ import (
 
 var bslog = logrus.New()
 var routeHandlers = make(map[string]handlers.HandlerInterface)
+var rankService services.RankService
+var rikishiService services.RikishiService
+var categoryService services.CategoryService
 var db *gorm.DB
 var log = logrus.New()
 
@@ -117,6 +121,12 @@ func buildAuthentication() error {
 	return authentication.SetNewAuthenticator(log, viper.GetString("authentication.config"))
 }
 
+func buildServices() {
+	rankService = services.NewRankService(log, db)
+	rikishiService = services.NewRikishiService(log, db, rankService)
+	categoryService = services.NewCategoryService(log, db, rikishiService)
+}
+
 func buildHandlers() {
 	bslog.Info("building handlers")
 
@@ -130,6 +140,7 @@ func buildHandlers() {
 		Handler: handlers.Handler{
 			Log: log,
 		},
+		CategoryService: categoryService,
 	}
 
 	bslog.Info("handlers built")
