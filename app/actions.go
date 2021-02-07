@@ -49,10 +49,15 @@ func load(c *cli.Context) error {
 		return err
 	}
 
-	service := services.NewLoadService(log, db, dataFile)
+	rankService := services.NewRankService(log, db)
+	rikishiService := services.NewRikishiService(log, db, rankService)
+	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService)
 
 	for _, arg := range c.Args().Slice() {
-		service.Load(arg)
+		if err := service.Load(arg); err != nil {
+			log.Errorf("error while loading %s: %s", arg, err)
+			return err
+		}
 	}
 	return nil
 }
