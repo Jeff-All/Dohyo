@@ -2,49 +2,73 @@
   rikishi:
     -
       Name: "Rikishi A"
-      Rank: Ozeki
+      Rank: Yokozuna
+      East: true
     -
       Name: "Rikishi B"
       Rank: Ozeki
+      East: true
     -
       Name: "Rikishi C"
       Rank: Ozeki
+      East: false
     -
       Name: "Rikishi D"
-      Rank: Ozeki
+      Rank: Sekiwake
+      East: true
     -
       Name: "Rikishi E"
-      Rank: Ozeki
+      Rank: Sekiwake
+      East: false
     -
       Name: "Rikishi F"
-      Rank: Ozeki
+      Rank: Komusubi
+      East: true
     -
       Name: "Rikishi G"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 1
+      East: true
     -
       Name: "Rikishi H"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 1
+      East: false
     -
       Name: "Rikishi I"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 2
+      East: true
     -
       Name: "Rikishi J"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 3
+      East: true
     -
       Name: "Rikishi K"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 4
+      East: true
     -
       Name: "Rikishi L"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 5
+      East: true
     -
       Name: "Rikishi M"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 6
+      East: true
     -
       Name: "Rikishi N"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 7
+      East: true
     -
       Name: "Rikishi O"
-      Rank: Ozeki
+      Rank: Maegashira
+      SubRank: 8
+      East: true
   categories:
     -
       Name: "A"
