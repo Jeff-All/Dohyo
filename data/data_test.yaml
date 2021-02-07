@@ -1,7 +1,66 @@
 ---
   rikishi:
-    Name: "Rikishi A"
-    Rank: Ozeki
+    -
+      Name: "Rikishi A"
+      Rank: Ozeki
+    -
+      Name: "Rikishi B"
+      Rank: Ozeki
+    -
+      Name: "Rikishi C"
+      Rank: Ozeki
+    -
+      Name: "Rikishi D"
+      Rank: Ozeki
+    -
+      Name: "Rikishi E"
+      Rank: Ozeki
+    -
+      Name: "Rikishi F"
+      Rank: Ozeki
+    -
+      Name: "Rikishi G"
+      Rank: Ozeki
+    -
+      Name: "Rikishi H"
+      Rank: Ozeki
+    -
+      Name: "Rikishi I"
+      Rank: Ozeki
+    -
+      Name: "Rikishi J"
+      Rank: Ozeki
+    -
+      Name: "Rikishi K"
+      Rank: Ozeki
+    -
+      Name: "Rikishi L"
+      Rank: Ozeki
+    -
+      Name: "Rikishi M"
+      Rank: Ozeki
+    -
+      Name: "Rikishi N"
+      Rank: Ozeki
+    -
+      Name: "Rikishi O"
+      Rank: Ozeki
+  categories:
+    -
+      Name: "A"
+      RikishiNames: ["Rikishi A","Rikishi B","Rikishi C"]
+    -
+      Name: "B"
+      RikishiNames: ["Rikishi D","Rikishi E","Rikishi F"]
+    -
+      Name: "C"
+      RikishiNames: ["Rikishi G","Rikishi H","Rikishi I"]
+    -
+      Name: "D"
+      RikishiNames: ["Rikishi J","Rikishi K","Rikishi L"]
+    -
+      Name: "E"
+      RikishiNames: ["Rikishi M","Rikishi N","Rikishi O"]
   ranks:
     -
       Level: 0
