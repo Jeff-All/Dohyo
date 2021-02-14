@@ -19,6 +19,10 @@ func GetModelFromID(id string) (interface{}, error) {
 		return &Rikishi{}, nil
 	case "category":
 		return &Category{}, nil
+	case "user":
+		return &User{}, nil
+	case "team":
+		return &Team{}, nil
 	default:
 		return nil, fmt.Errorf("Invalid model id '%s'", id)
 	}

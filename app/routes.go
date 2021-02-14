@@ -16,7 +16,8 @@ func defineRoutes(r *mux.Router) *mux.Router {
 		middlewares.LoggingMiddleware(log,
 			middlewares.CORSMiddleware(
 				middlewares.AuthorizationMiddleware(log,
-					routeHandlers["categorizedRikishis"]))))
+					middlewares.UserMiddleware(log, db,
+						routeHandlers["categorizedRikishis"])))))
 
 	r.PathPrefix("/private/").Handler(
 		middlewares.LoggingMiddleware(log,

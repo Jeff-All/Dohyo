@@ -11,7 +11,8 @@ import (
 )
 
 type authorizationUserInfo struct {
-	sub string
+	Sub   string
+	Email string
 }
 
 // AuthorizationMiddleware - Middleware for authorizing bearer tokens
@@ -20,6 +21,7 @@ func AuthorizationMiddleware(log *logrus.Logger, next http.Handler) http.Handler
 		var err error
 		var resp *http.Response
 		var req *http.Request
+		log.Infof("authorizing '%s'", r.Header.Get("Authorization"))
 		if req, err = http.NewRequest("GET", fmt.Sprintf("%s/userinfo", authentication.Domain()), nil); err != nil {
 			log.Error("error while building request to auth0 server: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -40,12 +42,15 @@ func AuthorizationMiddleware(log *logrus.Logger, next http.Handler) http.Handler
 			return
 		}
 		decoder := json.NewDecoder(resp.Body)
-		var json authorizationUserInfo
-		if err = decoder.Decode(&json); err != nil {
+		jsonObj := authorizationUserInfo{}
+		if err = decoder.Decode(&jsonObj); err != nil {
 			log.Errorf("error while decoding userinfo response: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
-		context.Set(r, "user", json.sub)
+		resp.Body.Close()
+		log.Infof("userID='%s', email='%s'", jsonObj.Sub, jsonObj.Email)
+		context.Set(r, "userID", jsonObj.Sub)
+		context.Set(r, "email", jsonObj.Email)
 		next.ServeHTTP(w, r)
 	})
 }
