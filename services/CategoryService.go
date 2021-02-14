@@ -114,3 +114,29 @@ func (s *CategoryService) GetRikishiByCategory() (map[string][]models.Rikishi, e
 
 	return rikishiMap, nil
 }
+
+// Count - Returns the number of categories currently configured in the DB
+func (s *CategoryService) Count() (int, error) {
+	var count int64 = 0
+	err := s.db.Model(&models.Category{}).Count(&count).Error
+	if err != nil {
+		s.log.Errorf("error pulling count from categories: %s", err)
+		return 0, err
+	}
+	return int(count), nil
+}
+
+// GetCategoryCountOfRikishis - Gets the number of distinct categories of the rikishis
+func (s *CategoryService) GetCategoryCountOfRikishis(rikishis []models.Rikishi) (int, error) {
+	rikishiIDs := make([]int, len(rikishis))
+	for i, rikishi := range rikishis {
+		rikishiIDs[i] = int(rikishi.ID)
+	}
+	var count int64 = 0
+	var err error
+	if err = s.db.Table("rikishis").Select("count(distinct(categories.id))").Joins("JOIN categories ON categories.id = rikishis.category_id").Where("rikishis.id IN ?", rikishiIDs).Count(&count).Error; err != nil {
+		s.log.Errorf("error pulling category count: %s", err)
+		return 0, err
+	}
+	return int(count), nil
+}

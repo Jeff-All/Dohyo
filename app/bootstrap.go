@@ -22,6 +22,7 @@ var routeHandlers = make(map[string]handlers.HandlerInterface)
 var rankService services.RankService
 var rikishiService services.RikishiService
 var categoryService services.CategoryService
+var teamService services.TeamService
 var db *gorm.DB
 var log = logrus.New()
 
@@ -122,6 +123,7 @@ func buildAuthentication() error {
 }
 
 func buildServices() {
+	teamService = services.NewTeamService(log, db)
 	rankService = services.NewRankService(log, db)
 	rikishiService = services.NewRikishiService(log, db, rankService)
 	categoryService = services.NewCategoryService(log, db, rikishiService)
@@ -140,6 +142,14 @@ func buildHandlers() {
 		Handler: handlers.Handler{
 			Log: log,
 		},
+		CategoryService: categoryService,
+	}
+
+	routeHandlers["teams"] = handlers.TeamHandler{
+		Handler: handlers.Handler{
+			Log: log,
+		},
+		TeamService:     teamService,
 		CategoryService: categoryService,
 	}
 

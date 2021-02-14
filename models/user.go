@@ -7,5 +7,5 @@ type User struct {
 	gorm.Model
 	Auth0ID string
 	Email   string
-	Teams   []Team
+	Team    Team
 }

@@ -46,6 +46,7 @@ func AuthorizationMiddleware(log *logrus.Logger, next http.Handler) http.Handler
 		if err = decoder.Decode(&jsonObj); err != nil {
 			log.Errorf("error while decoding userinfo response: %s", err)
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 		resp.Body.Close()
 		log.Infof("userID='%s', email='%s'", jsonObj.Sub, jsonObj.Email)
