@@ -16,6 +16,11 @@ type TeamHandler struct {
 	TeamService     services.TeamService
 }
 
+type TeamResponse struct {
+	IsSet       bool
+	RikishisMap map[string]models.Rikishi
+}
+
 func (h TeamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Log.Infof("TeamHandler serving request")
 
@@ -36,11 +41,37 @@ func (h TeamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "PUT":
 		h.put(user, w, r)
 		break
+	case "GET":
+		h.get(user, w, r)
+		break
 	default:
 		h.Log.Infof("invalid method %s", r.Method)
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+}
+
+func (h TeamHandler) get(user models.User, w http.ResponseWriter, r *http.Request) {
+	h.Log.Infof("serving GET")
+	var team models.Team
+	var err error
+	if team, err = h.TeamService.GetTeamWithRikishisForUser(user); err != nil {
+		h.Log.Errorf("error getting team for user: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	var rikishiMap map[string]models.Rikishi
+	if rikishiMap, err = h.CategoryService.GetRikishisByCategoryByID(team.Rikishis); err != nil {
+		h.Log.Errorf("error getting rikishi categories: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	arr, _ := json.Marshal(rikishiMap)
+
+	w.Write(arr)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h TeamHandler) put(user models.User, w http.ResponseWriter, r *http.Request) {

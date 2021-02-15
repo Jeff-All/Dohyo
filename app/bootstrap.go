@@ -123,10 +123,10 @@ func buildAuthentication() error {
 }
 
 func buildServices() {
-	teamService = services.NewTeamService(log, db)
 	rankService = services.NewRankService(log, db)
 	rikishiService = services.NewRikishiService(log, db, rankService)
 	categoryService = services.NewCategoryService(log, db, rikishiService)
+	teamService = services.NewTeamService(log, db)
 }
 
 func buildHandlers() {

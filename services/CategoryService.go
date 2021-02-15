@@ -92,7 +92,7 @@ func (s *CategoryService) GetAllCategoriesWithRikishis() ([]models.Category, err
 	return categories, result.Error
 }
 
-// GetRikishiByCategory - Returns a map of rikishi indexed b their category
+// GetRikishiByCategory - Returns a map of all rikishi indexed by their category
 func (s *CategoryService) GetRikishiByCategory() (map[string][]models.Rikishi, error) {
 	s.log.Infof("retrieving rikishi by their categories")
 
@@ -127,11 +127,8 @@ func (s *CategoryService) Count() (int, error) {
 }
 
 // GetCategoryCountOfRikishis - Gets the number of distinct categories of the rikishis
-func (s *CategoryService) GetCategoryCountOfRikishis(rikishis []models.Rikishi) (int, error) {
-	rikishiIDs := make([]int, len(rikishis))
-	for i, rikishi := range rikishis {
-		rikishiIDs[i] = int(rikishi.ID)
-	}
+func (s *CategoryService) GetCategoryCountOfRikishis(rikishis models.Rikishis) (int, error) {
+	rikishiIDs := rikishis.GetIDs()
 	var count int64 = 0
 	var err error
 	if err = s.db.Table("rikishis").Select("count(distinct(categories.id))").Joins("JOIN categories ON categories.id = rikishis.category_id").Where("rikishis.id IN ?", rikishiIDs).Count(&count).Error; err != nil {
@@ -139,4 +136,24 @@ func (s *CategoryService) GetCategoryCountOfRikishis(rikishis []models.Rikishi) 
 		return 0, err
 	}
 	return int(count), nil
+}
+
+type rikishiCategory struct {
+	models.Rikishi
+	Category string
+}
+
+// GetRikishisByCategoryByID - Returns the provided rikishis mapped to by their categories
+func (s *CategoryService) GetRikishisByCategoryByID(rikishis models.Rikishis) (map[string]models.Rikishi, error) {
+	rikishiIDs := rikishis.GetIDs()
+	rikishiCategories := make([]rikishiCategory, 0, len(rikishis))
+	if err := s.db.Table("rikishis").Select("rikishis.*, categories.name AS category").Joins("JOIN categories ON categories.id = rikishis.category_id").Where("rikishis.id IN ?", rikishiIDs).Find(&rikishiCategories).Error; err != nil {
+		s.log.Errorf("error getting rikishi categories: %s", err)
+		return nil, err
+	}
+	rikishiMap := make(map[string]models.Rikishi)
+	for _, rikishiCategory := range rikishiCategories {
+		rikishiMap[rikishiCategory.Category] = rikishiCategory.Rikishi
+	}
+	return rikishiMap, nil
 }

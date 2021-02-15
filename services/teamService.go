@@ -31,8 +31,7 @@ func (s *TeamService) SaveRikishisToTeam(user models.User, rikishis []models.Rik
 		s.log.Errorf("error pulling team for user: %s", err)
 		return err
 	}
-	if team.ID == 0 {
-		s.log.Infof("team id is 0")
+	if !team.IsCreated() {
 		if err = s.db.Create(&team).Error; err != nil {
 			s.log.Errorf("error creating team: %s", err)
 			return err
@@ -51,4 +50,21 @@ func (s *TeamService) SaveRikishisToTeam(user models.User, rikishis []models.Rik
 		return err
 	}
 	return nil
+}
+
+// GetTeamWithRikishisForUser - Returns the current team for the provided user
+// with rikishis filled
+func (s *TeamService) GetTeamWithRikishisForUser(user models.User) (models.Team, error) {
+	team := models.Team{}
+	if err := s.db.Model(&user).Association("Team").Find(&team); err != nil {
+		s.log.Errorf("error pulling team for user: %s", err)
+		return team, err
+	}
+	s.log.Infof("team is created: %v", team.IsCreated())
+	if err := s.db.Model(&team).Association("Rikishis").Find(&(team.Rikishis)); err != nil {
+		s.log.Errorf("error pulling rikishis for team: %s", err)
+		return team, err
+	}
+
+	return team, nil
 }
