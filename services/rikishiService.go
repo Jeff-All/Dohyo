@@ -1,7 +1,7 @@
 package services
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/sirupsen/logrus"
@@ -30,17 +30,24 @@ func NewRikishiService(
 
 // GetAllRikishi - Returns all rikishi in the database
 func (s *RikishiService) GetAllRikishi() ([]models.Rikishi, error) {
-	rikishis := []models.Rikishi{}
-	var result *gorm.DB
-	if result = s.db.Find(&rikishis); result.Error == nil {
-		s.log.Infof("successfully pulled all rikishi")
-		return rikishis, nil
-	} else if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		s.log.Infof("unable to find any rikishi entries")
-		return rikishis, nil
+	ranks := make([]models.Rank, 0)
+	if err := s.db.Preload("Rikishis").Find(&ranks).Error; err != nil {
+		s.log.Errorf("error while pulling ranks and rikishis: %s", err)
+		return nil, err
 	}
-	s.log.Errorf("error while retrieving rikishi entries: %s", result.Error)
-	return rikishis, result.Error
+
+	rikishis := []models.Rikishi{}
+	for _, rank := range ranks {
+		for _, rikishi := range rank.Rikishis {
+			rikishi.Rank = rank.Name
+			if rikishi.SubRank > 0 {
+				rikishi.Rank += fmt.Sprintf(" %d", rikishi.SubRank)
+			}
+			rikishis = append(rikishis, rikishi)
+		}
+	}
+	s.log.Infof("successfully pulled all rikishi")
+	return rikishis, nil
 }
 
 // GetRikishiMappedByName - Returns a map of all rikishi indexed by their Name column

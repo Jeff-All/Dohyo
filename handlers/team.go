@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/Jeff-All/Dohyo/services"
@@ -16,6 +17,7 @@ type TeamHandler struct {
 	TeamService     services.TeamService
 }
 
+// TeamResponse - The team response
 type TeamResponse struct {
 	IsSet       bool
 	RikishisMap map[string]models.Rikishi
@@ -68,7 +70,12 @@ func (h TeamHandler) get(user models.User, w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	arr, _ := json.Marshal(rikishiMap)
+	returnMap := make(map[string]string)
+	for key, rikishi := range rikishiMap {
+		returnMap[key] = strconv.FormatUint(uint64(rikishi.ID), 10)
+	}
+
+	arr, _ := json.Marshal(returnMap)
 
 	w.Write(arr)
 	w.WriteHeader(http.StatusOK)

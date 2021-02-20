@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Jeff-All/Dohyo/models"
 	"github.com/Jeff-All/Dohyo/services"
 )
 
@@ -17,7 +16,7 @@ type CategorizedRikishiHandler struct {
 func (h CategorizedRikishiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Log.Infof("CategorizeRikishiHandler serving request")
 
-	var rikishiMap map[string][]models.Rikishi
+	var rikishiMap map[string][]string
 	var err error
 	if rikishiMap, err = h.CategoryService.GetRikishiByCategory(); err != nil {
 		h.Log.Errorf("error while retriving rikishi by category: %s", err)

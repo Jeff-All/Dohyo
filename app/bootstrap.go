@@ -138,6 +138,13 @@ func buildHandlers() {
 		},
 	}
 
+	routeHandlers["rikishis"] = handlers.RikishisHandler{
+		Handler: handlers.Handler{
+			Log: log,
+		},
+		RikishiService: rikishiService,
+	}
+
 	routeHandlers["categorizedRikishis"] = handlers.CategorizedRikishiHandler{
 		Handler: handlers.Handler{
 			Log: log,

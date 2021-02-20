@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/sirupsen/logrus"
@@ -93,7 +94,7 @@ func (s *CategoryService) GetAllCategoriesWithRikishis() ([]models.Category, err
 }
 
 // GetRikishiByCategory - Returns a map of all rikishi indexed by their category
-func (s *CategoryService) GetRikishiByCategory() (map[string][]models.Rikishi, error) {
+func (s *CategoryService) GetRikishiByCategory() (map[string][]string, error) {
 	s.log.Infof("retrieving rikishi by their categories")
 
 	var categories []models.Category
@@ -103,11 +104,11 @@ func (s *CategoryService) GetRikishiByCategory() (map[string][]models.Rikishi, e
 		return nil, err
 	}
 
-	rikishiMap := make(map[string][]models.Rikishi)
+	rikishiMap := make(map[string][]string)
 	for _, category := range categories {
-		array := make([]models.Rikishi, len(category.Rikishis))
+		array := make([]string, len(category.Rikishis))
 		for index, rikishi := range category.Rikishis {
-			array[index] = rikishi
+			array[index] = strconv.FormatUint(uint64(rikishi.ID), 10)
 		}
 		rikishiMap[category.Name] = array
 	}

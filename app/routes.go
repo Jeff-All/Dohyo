@@ -19,6 +19,12 @@ func defineRoutes(r *mux.Router) *mux.Router {
 					middlewares.UserMiddleware(log, db,
 						routeHandlers["teams"])))))
 
+	r.Handle("/rikishis",
+		middlewares.LoggingMiddleware(log,
+			middlewares.CORSMiddleware(
+				middlewares.AuthorizationMiddleware(log,
+					routeHandlers["rikishis"]))))
+
 	r.Handle("/rikishis/categorized",
 		middlewares.LoggingMiddleware(log,
 			middlewares.CORSMiddleware(
