@@ -19,6 +19,7 @@ func run(c *cli.Context) error {
 		return err
 	}
 	buildServices()
+	buildMiddleware()
 	buildHandlers()
 	router := buildRouter()
 	defineRoutes(router)

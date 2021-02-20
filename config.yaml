@@ -9,3 +9,6 @@
     filename: databases/data.db
   authentication:
     config: "./authentication.yaml"
+  authorization:
+    cacheDuration: 5m
+    cacheCleanup: 10m

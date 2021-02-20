@@ -7,6 +7,7 @@ import (
 
 	"github.com/Jeff-All/Dohyo/authentication"
 	"github.com/gorilla/context"
+	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,42 +17,59 @@ type authorizationUserInfo struct {
 }
 
 // AuthorizationMiddleware - Middleware for authorizing bearer tokens
-func AuthorizationMiddleware(log *logrus.Logger, next http.Handler) http.Handler {
+type AuthorizationMiddleware struct {
+	Log   *logrus.Logger
+	Cache *cache.Cache
+}
+
+// BuildHandler - Middleware for authorizing bearer tokens
+func (m *AuthorizationMiddleware) BuildHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var err error
-		var resp *http.Response
-		var req *http.Request
-		log.Infof("authorizing '%s'", r.Header.Get("Authorization"))
-		if req, err = http.NewRequest("GET", fmt.Sprintf("%s/userinfo", authentication.Domain()), nil); err != nil {
-			log.Error("error while building request to auth0 server: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
+		bearerToken := r.Header.Get("Authorization")
+		m.Log.Infof("authorizing '%s'", bearerToken)
+		var user authorizationUserInfo
+		if userI, found := m.Cache.Get(bearerToken); !found {
+			m.Log.Infof("cache miss for %s", bearerToken)
+			var err error
+			var resp *http.Response
+			var req *http.Request
+
+			if req, err = http.NewRequest("GET", fmt.Sprintf("%s/userinfo", authentication.Domain()), nil); err != nil {
+				m.Log.Error("error while building request to auth0 server: %s", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			req.Header.Set("Authorization", r.Header.Get("Authorization"))
+			if resp, err = http.DefaultClient.Do(req); err != nil {
+				m.Log.Error("error while authorizing request: %s", err)
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			} else if resp.StatusCode == http.StatusUnauthorized {
+				m.Log.Info("couldn't authorize bearer token")
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			} else if resp.StatusCode != http.StatusOK {
+				m.Log.Infof("unexpected status code while authorizing bearer token: %s", resp.StatusCode)
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			decoder := json.NewDecoder(resp.Body)
+			user := authorizationUserInfo{}
+			if err = decoder.Decode(&user); err != nil {
+				m.Log.Errorf("error while decoding userinfo response: %s", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			resp.Body.Close()
+			m.Cache.Set(bearerToken, &user, cache.DefaultExpiration)
+		} else {
+			m.Log.Infof("cache hit for %s", bearerToken)
+			user = *(userI.(*authorizationUserInfo))
 		}
-		req.Header.Set("Authorization", r.Header.Get("Authorization"))
-		if resp, err = http.DefaultClient.Do(req); err != nil {
-			log.Error("error while authorizing request: %s", err)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		} else if resp.StatusCode == http.StatusUnauthorized {
-			log.Info("couldn't authorize bearer token")
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		} else if resp.StatusCode != http.StatusOK {
-			log.Infof("unexpected status code while authorizing bearer token: %s", resp.StatusCode)
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-		decoder := json.NewDecoder(resp.Body)
-		jsonObj := authorizationUserInfo{}
-		if err = decoder.Decode(&jsonObj); err != nil {
-			log.Errorf("error while decoding userinfo response: %s", err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		resp.Body.Close()
-		log.Infof("userID='%s', email='%s'", jsonObj.Sub, jsonObj.Email)
-		context.Set(r, "userID", jsonObj.Sub)
-		context.Set(r, "email", jsonObj.Email)
+
+		m.Log.Infof("userID='%s', email='%s'", user.Sub, user.Email)
+		context.Set(r, "userID", user.Sub)
+		context.Set(r, "email", user.Email)
 		next.ServeHTTP(w, r)
 	})
 }

@@ -8,8 +8,10 @@ import (
 	"github.com/Jeff-All/Dohyo/authentication"
 	"github.com/Jeff-All/Dohyo/handlers"
 	"github.com/Jeff-All/Dohyo/helpers"
+	"github.com/Jeff-All/Dohyo/middlewares"
 	"github.com/Jeff-All/Dohyo/services"
 	"github.com/gorilla/mux"
+	"github.com/patrickmn/go-cache"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli/v2"
@@ -19,6 +21,7 @@ import (
 
 var bslog = logrus.New()
 var routeHandlers = make(map[string]handlers.HandlerInterface)
+var middleware = make(map[string]middlewares.MiddlewareInterface)
 var rankService services.RankService
 var rikishiService services.RikishiService
 var categoryService services.CategoryService
@@ -178,4 +181,21 @@ func buildRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	return r
+}
+
+func buildMiddleware() {
+	authorizationCacheDuration := viper.GetDuration("authorization.cacheDuration")
+	authorizationCacheCleanup := viper.GetDuration("authorization.cacheCleanup")
+	bslog.Infof(
+		"building authorization middleware(cacheDuration=%v,cacheCleanup=%v",
+		authorizationCacheDuration,
+		authorizationCacheCleanup,
+	)
+	middleware["authorization"] = &middlewares.AuthorizationMiddleware{
+		Log: log,
+		Cache: cache.New(
+			authorizationCacheDuration,
+			authorizationCacheCleanup,
+		),
+	}
 }
