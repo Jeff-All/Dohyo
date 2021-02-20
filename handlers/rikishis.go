@@ -31,7 +31,6 @@ func (h RikishisHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(arr)
-	w.WriteHeader(http.StatusOK)
 }

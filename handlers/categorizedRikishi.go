@@ -29,5 +29,4 @@ func (h CategorizedRikishiHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 }

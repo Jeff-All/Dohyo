@@ -76,9 +76,8 @@ func (h TeamHandler) get(user models.User, w http.ResponseWriter, r *http.Reques
 	}
 
 	arr, _ := json.Marshal(returnMap)
-
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(arr)
-	w.WriteHeader(http.StatusOK)
 }
 
 func (h TeamHandler) put(user models.User, w http.ResponseWriter, r *http.Request) {
