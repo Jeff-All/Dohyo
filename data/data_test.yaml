@@ -104,4 +104,20 @@
     -
       Level: 5
       Name: Juryo
-  
+  Tournament:
+    -
+      Name: "September '20"
+      Month: "September"
+      year: 2020
+    -
+      Name: "November '20"
+      Month: "November"
+      year: 2020
+    -
+      Name: "January '21"
+      Month: "January"
+      year: 2021
+    -
+      Name: "March '21"
+      Month: "March"
+      year: 2021

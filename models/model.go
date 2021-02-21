@@ -23,6 +23,8 @@ func GetModelFromID(id string) (interface{}, error) {
 		return &User{}, nil
 	case "team":
 		return &Team{}, nil
+	case "tournament":
+		return &Tournament{}, nil
 	default:
 		return nil, fmt.Errorf("Invalid model id '%s'", id)
 	}

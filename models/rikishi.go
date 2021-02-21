@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Rikishis - A rikishi array
 type Rikishis []Rikishi
 
 // Rikishi - Database model representing a Rikishi(Sumo Wrestler)

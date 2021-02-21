@@ -1,6 +1,8 @@
 package services
 
 import (
+	"reflect"
+
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -30,6 +32,7 @@ func (s *MigrationService) MigrateModels(ids ...string) error {
 		if model, err = models.GetModelFromID(id); err != nil {
 			return err
 		}
+		reflect.ValueOf(model)
 		objects[index] = model
 		_ = append(objects, model)
 	}

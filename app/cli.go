@@ -55,6 +55,10 @@ func ExecApp() {
 						Usage:    "data file to source the data from",
 						Required: true,
 					},
+					&cli.BoolFlag{
+						Name:  "clear",
+						Usage: "clear the tables before adding data",
+					},
 				},
 			},
 			{

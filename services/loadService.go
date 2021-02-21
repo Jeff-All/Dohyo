@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"reflect"
 
 	"github.com/Jeff-All/Dohyo/models"
 	"github.com/sirupsen/logrus"
@@ -41,65 +41,38 @@ func NewLoadService(
 }
 
 // Load - Loads data from the data file into the given table
-func (s LoadService) Load(model string) error {
+func (s LoadService) Load(model string, clear bool) error {
 	s.log.Infof("Loading '%s'", model)
-	switch model {
-	case "rank":
-		return s.LoadRanks()
-	case "rikishi":
-		return s.LoadRikishi()
-	case "category":
-		return s.LoadCategories()
-	default:
-		s.log.Errorf("invalid model '%s'", model)
-		return fmt.Errorf("invalid model '%s'", model)
+	var obj interface{}
+	var err error
+	if obj, err = models.GetModelFromID(model); err != nil {
+		s.log.Errorf("error while loading model '%s': %s", model, err)
 	}
+	return s.LoadModel(obj, clear)
 }
 
-// LoadRanks - Fills the Ranks table with data from the data file
-func (s LoadService) LoadRanks() error {
-	s.log.Info("loading ranks from config")
-	var ranks []models.Rank
-	s.data.UnmarshalKey("ranks", &ranks)
+// LoadModel - Loads the given model into the database
+func (s LoadService) LoadModel(model interface{}, clear bool) error {
+	modelType := reflect.ValueOf(model).Elem().Type()
+	s.log.Infof("loading '%s' from config", modelType.Name())
 
-	s.log.Infof("loading %d rank entries", len(ranks))
+	if clear {
+		s.log.Infof("clearing '%s' from the database", modelType.Name())
+		s.db.Unscoped().Where("1 = 1").Delete(model)
+	}
 
-	fmt.Println(s.data.GetStringMap("ranks"))
+	modelSlice := reflect.New(reflect.SliceOf(modelType))
+	s.data.UnmarshalKey(modelType.Name(), modelSlice.Interface())
 
-	s.db.Unscoped().Exec("DELETE FROM ranks")
+	for index := 0; index < modelSlice.Elem().Len(); index++ {
+		s.log.Infof("[%d]=%v", index, modelSlice.Elem().Index(index))
+	}
 
-	s.db.Create(&ranks)
-	s.log.Info("loaded ranks")
-	return nil
-}
-
-// LoadRikishi - Fills the Ranks table with data from the data file
-func (s LoadService) LoadRikishi() error {
-	s.log.Info("loading rikishi from config")
-	var rikishi []models.Rikishi
-	s.data.UnmarshalKey("rikishi", &rikishi)
-
-	if err := s.rikishiService.AddRikishi(rikishi); err != nil {
-		s.log.Errorf("error while adding rikishi: %s", err)
+	if err := s.db.Create(modelSlice.Interface()).Error; err != nil {
+		s.log.Errorf("error loading %s into the database: %s", modelType.Name(), err)
 		return err
 	}
 
-	s.log.Info("loaded rikishi")
-	return nil
-}
-
-// LoadCategories - Fills the Categories tables with data from the data file
-func (s LoadService) LoadCategories() error {
-	s.log.Info("loading categories from config")
-
-	var categories []models.Category
-	s.data.UnmarshalKey("categories", &categories)
-
-	if err := s.categoryService.SetCategories(categories); err != nil {
-		s.log.Errorf("error while adding categories: %s", err)
-		return err
-	}
-
-	s.log.Info("loaded categories")
+	s.log.Infof("loaded %s", modelType.Name())
 	return nil
 }

@@ -58,7 +58,7 @@ func load(c *cli.Context) error {
 	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService, categoryService)
 
 	for _, arg := range c.Args().Slice() {
-		if err := service.Load(arg); err != nil {
+		if err := service.Load(arg, c.Bool("clear")); err != nil {
 			log.Errorf("error while loading %s: %s", arg, err)
 			return err
 		}
