@@ -5,46 +5,44 @@
      Day: 1
      East: "Rikishi A"
      West: "Rikishi B"
-     Result: "TBD"
+     Winner: "Rikishi A"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi C"
      West: "Rikishi D"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi E"
      West: "Rikishi F"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi G"
      West: "Rikishi H"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi I"
      West: "Rikishi J"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi K"
      West: "Rikishi L"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi M"
      West: "Rikishi N"
-     Result: "TBD"
     -
      Tournament: "March '21"
      Day: 1
      East: "Rikishi O"
      West: "Rikishi P"
-     Result: "TBD"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi A"
+     West: "Rikishi C"

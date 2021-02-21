@@ -90,3 +90,24 @@ func migrate(c *cli.Context) error {
 	service.MigrateModels(c.Args().Slice()...)
 	return nil
 }
+
+func sql(c *cli.Context) error {
+	if err := bootstrap(c); err != nil {
+		return err
+	}
+	if err := loadDB(); err != nil {
+		return err
+	}
+	var err error
+	var sql []byte
+	filename := c.String("file")
+	if sql, err = helpers.ReadFile(filename); err != nil {
+		log.Errorf("error reading file %s", filename)
+	}
+	log.Info("executing SQL against the database: %s", string(sql))
+	if err = db.Exec(string(sql)).Error; err != nil {
+		log.Errorf("error executing SQL: %s")
+		return err
+	}
+	return nil
+}

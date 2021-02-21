@@ -9,7 +9,8 @@ type Match struct {
 	Day          uint
 	EastID       uint
 	WestID       uint
-	Result       string
+	WinnerID     uint
+	Winner       string `gorm:"-"`
 	Tournament   string `gorm:"-"`
 	East         string `gorm:"-"`
 	West         string `gorm:"-"`

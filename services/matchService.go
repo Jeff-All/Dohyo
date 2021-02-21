@@ -33,15 +33,10 @@ func NewMatchService(
 // AddMatches - Adds the provided matches to the database
 func (s *MatchService) AddMatches(matches []models.Match) error {
 	s.log.Infof("adding %d matches", len(matches))
-
 	var err error
 	var rikishis map[string]models.Rikishi
 	if rikishis, err = s.rikishiService.GetRikishiMappedByName(); err != nil {
 		s.log.Errorf("error getting rikishis by name: %s", err)
-		return err
-	}
-	if err = s.db.Create(matches).Error; err != nil {
-		s.log.Errorf("error creating matches: %s", err)
 		return err
 	}
 	var tournaments map[string]models.Tournament
@@ -49,6 +44,11 @@ func (s *MatchService) AddMatches(matches []models.Match) error {
 		s.log.Errorf("error getting tournaments by name: %s", err)
 		return err
 	}
+	if err = s.db.Create(matches).Error; err != nil {
+		s.log.Errorf("error creating matches: %s", err)
+		return err
+	}
+
 	for _, match := range matches {
 		if tournament, ok := tournaments[match.Tournament]; !ok {
 			s.log.Infof("unknown tournament '%s'", match.Tournament)
@@ -56,25 +56,38 @@ func (s *MatchService) AddMatches(matches []models.Match) error {
 			s.log.Infof("binding tournament %s to match", match.Tournament)
 			s.db.Model(&tournament).Association("Matches").Append(&match)
 		}
+		if match.Winner != "" {
+			if rikishi, ok := rikishis[match.Winner]; !ok {
+				s.log.Infof("unknown winning rikishi '%d' for match", match.Winner)
+			} else {
+				s.log.Infof("binding winning rikishi '%d' for match", rikishi.ID)
+				match.WinnerID = rikishi.ID
+				if err = s.db.Save(&match).Error; err != nil {
+					s.log.Errorf("error saving match: %s", err)
+					return err
+				}
+			}
+		}
 		if rikishi, ok := rikishis[match.East]; !ok {
-			s.log.Infof("unknown rikishi '%s' for match", match.East)
+			s.log.Infof("unknown east rikishi '%s' for match", match.East)
 		} else {
-			s.log.Infof("binding rikishi '%s' to match", match.East)
+			s.log.Infof("binding east rikishi '%s' to match", match.East)
 			if err = s.db.Model(&rikishi).Association("EastMatches").Append(&match); err != nil {
-				s.log.Errorf("error while binding rikishi '%s' to match: %s", match.East, err)
+				s.log.Errorf("error while binding east rikishi '%s' to match: %s", match.East, err)
 				return err
 			}
 		}
 		if rikishi, ok := rikishis[match.West]; !ok {
-			s.log.Infof("unknown rikishi '%s' for match", match.West)
+			s.log.Infof("unknown west rikishi '%s' for match", match.West)
 		} else {
-			s.log.Infof("binding rikishi '%s' to match", match.West)
+			s.log.Infof("binding west rikishi '%s' to match", match.West)
 			if err = s.db.Model(&rikishi).Association("WestMatches").Append(&match); err != nil {
-				s.log.Errorf("error while binding rikishi '%s' to match: %s", match.West, err)
+				s.log.Errorf("error while binding west rikishi '%s' to match: %s", match.West, err)
 				return err
 			}
 		}
 	}
+
 	for _, tournament := range tournaments {
 		if err = s.db.Save(&tournament).Error; err != nil {
 			s.log.Errorf("error while saving tournament updates: %s", err)

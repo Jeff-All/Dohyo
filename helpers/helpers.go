@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +32,11 @@ func HigherLogLevel(config string, cli string) (log.Level, error) {
 // DeleteFile - Deletes the file
 func DeleteFile(filename string) error {
 	return os.Remove(filename)
+}
+
+// ReadFile - Returns the file as a byte array
+func ReadFile(filename string) ([]byte, error) {
+	return ioutil.ReadFile(filename)
 }
 
 // AppendOrCreateFile - Opens an existing file to be appended or creates a new one if

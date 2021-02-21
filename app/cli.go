@@ -50,6 +50,18 @@ func ExecApp() {
 				Action: run,
 			},
 			{
+				Name:   "sql",
+				Usage:  "execute the SQL file",
+				Action: sql,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "file",
+						Usage:    "the SQL file to execute",
+						Required: true,
+					},
+				},
+			},
+			{
 				Name:   "activate",
 				Usage:  "sets the active tournament",
 				Action: activate,
