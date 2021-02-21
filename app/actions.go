@@ -29,6 +29,17 @@ func run(c *cli.Context) error {
 	return nil
 }
 
+func activate(c *cli.Context) error {
+	if err := bootstrap(c); err != nil {
+		return err
+	}
+	if err := loadDB(); err != nil {
+		return err
+	}
+	buildServices()
+	return tournamentService.SetCurrentTournament(c.String("name"))
+}
+
 func load(c *cli.Context) error {
 	if err := bootstrap(c); err != nil {
 		return err
@@ -55,7 +66,7 @@ func load(c *cli.Context) error {
 	}
 
 	buildServices()
-	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService, categoryService)
+	service := services.NewLoadService(log, db, dataFile, rankService, rikishiService, categoryService, matchService)
 
 	for _, arg := range c.Args().Slice() {
 		if err := service.Load(arg, c.Bool("clear")); err != nil {

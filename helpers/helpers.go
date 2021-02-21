@@ -28,6 +28,11 @@ func HigherLogLevel(config string, cli string) (log.Level, error) {
 	return log.ErrorLevel, fmt.Errorf("invalid log level: %s && %s", config, cli)
 }
 
+// DeleteFile - Deletes the file
+func DeleteFile(filename string) error {
+	return os.Remove(filename)
+}
+
 // AppendOrCreateFile - Opens an existing file to be appended or creates a new one if
 // it does not already exist
 func AppendOrCreateFile(filename string) (*os.File, error) {

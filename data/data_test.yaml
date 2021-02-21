@@ -69,7 +69,11 @@
       Rank: Maegashira
       SubRank: 8
       East: true
-  categories:
+    -
+      Name: "Rikishi P"
+      Rank: Juryo
+      East: true
+  Category:
     -
       Name: "A"
       RikishiNames: ["Rikishi A","Rikishi B", "Rikishi C"]
@@ -121,3 +125,10 @@
       Name: "March '21"
       Month: "March"
       year: 2021
+  Match:
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi A"
+     West: "Rikishi B"
+     Result: "Rikishi B"

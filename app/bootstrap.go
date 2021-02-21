@@ -26,6 +26,8 @@ var rankService services.RankService
 var rikishiService services.RikishiService
 var categoryService services.CategoryService
 var teamService services.TeamService
+var matchService services.MatchService
+var tournamentService services.TournamentService
 var db *gorm.DB
 var log = logrus.New()
 
@@ -94,6 +96,12 @@ func loadLog(c *cli.Context) error {
 	}).Info("log configuration")
 
 	var err error
+	if c.Bool("log-clear") {
+		bslog.Infof("deleting log file")
+		if err = helpers.DeleteFile(configLog); err != nil {
+			return fmt.Errorf("error while deleting log file: %s", err)
+		}
+	}
 	bslog.Info("loading log file")
 	if log.Out, err = helpers.AppendOrCreateFile(configLog); err != nil {
 		return fmt.Errorf("error while opening log file: %s", err)
@@ -130,6 +138,8 @@ func buildServices() {
 	rikishiService = services.NewRikishiService(log, db, rankService)
 	categoryService = services.NewCategoryService(log, db, rikishiService)
 	teamService = services.NewTeamService(log, db)
+	tournamentService = services.NewTournamentService(log, db)
+	matchService = services.NewMatchService(log, db, rikishiService, tournamentService)
 }
 
 func buildHandlers() {

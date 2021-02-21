@@ -25,6 +25,8 @@ func GetModelFromID(id string) (interface{}, error) {
 		return &Team{}, nil
 	case "tournament":
 		return &Tournament{}, nil
+	case "match":
+		return &Match{}, nil
 	default:
 		return nil, fmt.Errorf("Invalid model id '%s'", id)
 	}

@@ -38,12 +38,28 @@ func ExecApp() {
 				Value: "error",
 				Usage: "logging level (Error, Warn, Info, Debug)",
 			},
+			&cli.BoolFlag{
+				Name:  "log-clear",
+				Usage: "clears the log files before execution",
+			},
 		},
 		Commands: []*cli.Command{
 			{
 				Name:   "run",
 				Usage:  "run the server",
 				Action: run,
+			},
+			{
+				Name:   "activate",
+				Usage:  "sets the active tournament",
+				Action: activate,
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "name",
+						Usage:    "tournament name to set as the active tournament",
+						Required: true,
+					},
+				},
 			},
 			{
 				Name:   "load",
