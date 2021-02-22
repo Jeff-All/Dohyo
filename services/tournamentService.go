@@ -22,7 +22,7 @@ func NewTournamentService(
 	return TournamentService{
 		log:               log,
 		db:                db,
-		currentTournament: nil,
+		currentTournament: &models.Tournament{},
 	}
 }
 
@@ -49,14 +49,15 @@ func (s *TournamentService) SetCurrentTournament(name string) error {
 
 // GetCurrentTournament - Retrieves the current tournament from the TournamentService.currentTournament
 // if null it pulls and sets it from the database
-func (s *TournamentService) GetCurrentTournament() (models.Tournament, error) {
-	if s.currentTournament == nil {
-		if err := s.db.Where("current = true").First(s.GetCurrentTournament()).Error; err != nil {
-			s.log.Errorf("error while retrieving current tournament")
-			return models.Tournament{}, err
+func (s *TournamentService) GetCurrentTournament() (*models.Tournament, error) {
+	if s.currentTournament.ID == 0 {
+		if err := s.db.Where("current = true").First(s.currentTournament).Error; err != nil {
+			s.log.Errorf("error while retrieving current tournament: %s", err)
+			return nil, err
 		}
+		s.log.Infof("pulled current tournament '%d'", s.currentTournament.ID)
 	}
-	return *s.currentTournament, nil
+	return s.currentTournament, nil
 }
 
 // GetAllTournaments - Retrieves all tournaments in the database

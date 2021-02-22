@@ -134,11 +134,11 @@ func buildAuthentication() error {
 }
 
 func buildServices() {
+	tournamentService = services.NewTournamentService(log, db)
 	rankService = services.NewRankService(log, db)
-	rikishiService = services.NewRikishiService(log, db, rankService)
+	rikishiService = services.NewRikishiService(log, db, rankService, tournamentService)
 	categoryService = services.NewCategoryService(log, db, rikishiService)
 	teamService = services.NewTeamService(log, db)
-	tournamentService = services.NewTournamentService(log, db)
 	matchService = services.NewMatchService(log, db, rikishiService, tournamentService)
 }
 

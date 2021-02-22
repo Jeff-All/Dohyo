@@ -4,15 +4,17 @@ import (
 	"fmt"
 
 	"github.com/Jeff-All/Dohyo/models"
+	"github.com/Jeff-All/Dohyo/responses"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 // RikishiService - Provides functions for accessing the Rikishi data
 type RikishiService struct {
-	log         *logrus.Logger
-	db          *gorm.DB
-	rankService RankService
+	log               *logrus.Logger
+	db                *gorm.DB
+	rankService       RankService
+	TournamentService TournamentService
 }
 
 // NewRikishiService - Instantiates a new RikishiService
@@ -20,12 +22,54 @@ func NewRikishiService(
 	log *logrus.Logger,
 	db *gorm.DB,
 	rankService RankService,
+	tournamentService TournamentService,
 ) RikishiService {
 	return RikishiService{
-		log:         log,
-		db:          db,
-		rankService: rankService,
+		log:               log,
+		db:                db,
+		rankService:       rankService,
+		TournamentService: tournamentService,
 	}
+}
+
+// GetAllCurrentCompleteRikishi - returns all the rikishi with their current tournament's matches
+func (s RikishiService) GetAllCurrentCompleteRikishi() ([]responses.Rikishi, error) {
+	rikishis := []responses.Rikishi{}
+	if err := s.db.Raw("SELECT id, name, avatar, rank FROM rikishis_complete ORDER BY id").Scan(&rikishis).Error; err != nil {
+		s.log.Errorf("error while pulling all complete rikishi: %s", err)
+		return nil, err
+	}
+	var tournament *models.Tournament
+	var err error
+	if tournament, err = s.TournamentService.GetCurrentTournament(); err != nil {
+		s.log.Errorf("error getting current tournament: %s", err)
+	} else if tournament.ID != 0 {
+		s.log.Infof("scanning current matches into rikishis")
+		for i := 0; i < len(rikishis); i++ {
+			rikishi := &rikishis[i]
+			s.log.Infof("scanning matches into '%d'", rikishi.ID)
+			matches := []responses.Match{}
+			if err := s.db.Raw("SELECT day, opponent, concluded, won FROM rikishi_matches WHERE tournament_id = ? AND rikishi_id = ? ORDER BY rikishi_id", tournament.ID, rikishi.ID).Scan(&matches).Error; err != nil {
+				s.log.Errorf("error loading matches for rikishi '%d': %s", rikishi.ID, err)
+				return nil, err
+			}
+			rikishi.Matches = make(map[uint]responses.Match, len(matches))
+			for _, match := range matches {
+				rikishi.Matches[match.Day] = match
+				if match.Concluded {
+					if match.Won {
+						rikishi.Wins++
+					} else {
+						rikishi.Losses++
+					}
+				}
+			}
+		}
+	} else {
+		s.log.Infof("there is no current tournament set")
+	}
+
+	return rikishis, nil
 }
 
 // GetAllRikishi - Returns all rikishi in the database

@@ -53,7 +53,7 @@ func (s *CategoryService) SetCategories(categories []models.Category) error {
 		}
 	}
 
-	for _, category := range categories {
+	for category := range categories {
 		s.db.Save(category)
 	}
 
