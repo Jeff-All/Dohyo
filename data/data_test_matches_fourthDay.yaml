@@ -1,0 +1,189 @@
+---
+  Match:
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi A"
+     West: "Rikishi B"
+     Winner: "Rikishi A"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi C"
+     West: "Rikishi D"
+     Winner: "Rikishi C"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi E"
+     West: "Rikishi F"
+     Winner: "Rikishi E"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi G"
+     West: "Rikishi H"
+     Winner: "Rikishi G"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi I"
+     West: "Rikishi J"
+     Winner: "Rikishi I"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi K"
+     West: "Rikishi L"
+     Winner: "Rikishi K"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi M"
+     West: "Rikishi N"
+     Winner: "Rikishi M"
+    -
+     Tournament: "March '21"
+     Day: 1
+     East: "Rikishi O"
+     West: "Rikishi P"
+     Winner: "Rikishi O"
+# Day 2
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi A"
+     West: "Rikishi C"
+     Winner: "Rikishi C"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi B"
+     West: "Rikishi D"
+     Winner: "Rikishi D"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi E"
+     West: "Rikishi G"
+     Winner: "Rikishi G"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi F"
+     West: "Rikishi H"
+     Winner: "Rikishi H"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi I"
+     West: "Rikishi K"
+     Winner: "Rikishi K"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi J"
+     West: "Rikishi L"
+     Winner: "Rikishi L"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi M"
+     West: "Rikishi O"
+     Winner: "Rikishi O"
+    -
+     Tournament: "March '21"
+     Day: 2
+     East: "Rikishi N"
+     West: "Rikishi P"
+     Winner: "Rikishi P"
+# Day 3
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi A"
+     West: "Rikishi D"
+     Winner: "Rikishi A"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi B"
+     West: "Rikishi C"
+     Winner: "Rikishi C"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi E"
+     West: "Rikishi H"
+     Winner: "Rikishi E"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi F"
+     West: "Rikishi G"
+     Winner: "Rikishi G"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi I"
+     West: "Rikishi L"
+     Winner: "Rikishi I"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi J"
+     West: "Rikishi K"
+     Winner: "Rikishi K"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi M"
+     West: "Rikishi P"
+     Winner: "Rikishi M"
+    -
+     Tournament: "March '21"
+     Day: 3
+     East: "Rikishi N"
+     West: "Rikishi O"
+     Winner: "Rikishi O"
+# Day 4
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi A"
+     West: "Rikishi E"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi C"
+     West: "Rikishi G"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi B"
+     West: "Rikishi F"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi D"
+     West: "Rikishi H"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi I"
+     West: "Rikishi M"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi K"
+     West: "Rikishi O"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi J"
+     West: "Rikishi N"
+    -
+     Tournament: "March '21"
+     Day: 4
+     East: "Rikishi L"
+     West: "Rikishi P"
