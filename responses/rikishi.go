@@ -9,4 +9,5 @@ type Rikishi struct {
 	Wins    uint           `gorm:"-"`
 	Losses  uint           `gorm:"-"`
 	Matches map[uint]Match `gorm:"-"`
+	Results []Result       `gorm:"-"`
 }

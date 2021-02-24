@@ -47,22 +47,13 @@ func (s RikishiService) GetAllCurrentCompleteRikishi() ([]responses.Rikishi, err
 		s.log.Infof("scanning current matches into rikishis")
 		for i := 0; i < len(rikishis); i++ {
 			rikishi := &rikishis[i]
-			s.log.Infof("scanning matches into '%d'", rikishi.ID)
-			matches := []responses.Match{}
-			if err := s.db.Raw("SELECT day, opponent, concluded, won FROM rikishi_matches WHERE tournament_id = ? AND rikishi_id = ? ORDER BY rikishi_id", tournament.ID, rikishi.ID).Scan(&matches).Error; err != nil {
-				s.log.Errorf("error loading matches for rikishi '%d': %s", rikishi.ID, err)
+			if err = s.PopulateTournamentMatchesForRikishi(rikishi, *tournament); err != nil {
+				s.log.Errorf("error populating tournament matches: %s", err)
 				return nil, err
 			}
-			rikishi.Matches = make(map[uint]responses.Match, len(matches))
-			for _, match := range matches {
-				rikishi.Matches[match.Day] = match
-				if match.Concluded {
-					if match.Won {
-						rikishi.Wins++
-					} else {
-						rikishi.Losses++
-					}
-				}
+			if err = s.PopulateTournamentResultsForRikishi(rikishi, 5); err != nil {
+				s.log.Errorf("error populating tournament results: %s", err)
+				return nil, err
 			}
 		}
 	} else {
@@ -70,6 +61,43 @@ func (s RikishiService) GetAllCurrentCompleteRikishi() ([]responses.Rikishi, err
 	}
 
 	return rikishis, nil
+}
+
+// PopulateTournamentMatchesForRikishi - Fills matches for the given rikishi
+func (s *RikishiService) PopulateTournamentMatchesForRikishi(rikishi *responses.Rikishi, tournament models.Tournament) error {
+	s.log.Infof("scanning matches into '%d'", rikishi.ID)
+	matches := []responses.Match{}
+	if err := s.db.Raw("SELECT day, opponent, concluded, won FROM rikishi_matches WHERE tournament_id = ? AND rikishi_id = ? ORDER BY day", tournament.ID, rikishi.ID).Scan(&matches).Error; err != nil {
+		s.log.Errorf("error loading matches for rikishi '%d': %s", rikishi.ID, err)
+		return err
+	}
+	rikishi.Matches = make(map[uint]responses.Match, len(matches))
+	for _, match := range matches {
+		rikishi.Matches[match.Day] = match
+		if match.Concluded {
+			if match.Won {
+				rikishi.Wins++
+			} else {
+				rikishi.Losses++
+			}
+		}
+	}
+	return nil
+}
+
+// PopulateTournamentResultsForRikishi - Fills matches for the given rikishi
+func (s *RikishiService) PopulateTournamentResultsForRikishi(
+	rikishi *responses.Rikishi,
+	count int,
+) error {
+	s.log.Infof("scanning results into '%d'", rikishi.ID)
+	results := []responses.Result{}
+	if err := s.db.Raw("SELECT tournament, wins, losses FROM tournament_results WHERE rikishi_id = ? ORDER BY tournament_id ASC LIMIT ?", rikishi.ID, count).Scan(&results).Error; err != nil {
+		s.log.Errorf("error loading results for rikishi '%d': %s", rikishi.ID, err)
+		return err
+	}
+	rikishi.Results = results
+	return nil
 }
 
 // GetAllRikishi - Returns all rikishi in the database
