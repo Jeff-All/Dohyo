@@ -44,7 +44,9 @@ func (m *AuthorizationMiddleware) BuildHandler(next http.Handler) http.Handler {
 				m.Log.Error("error while authorizing request: %s", err)
 				w.WriteHeader(http.StatusUnauthorized)
 				return
-			} else if resp.StatusCode == http.StatusUnauthorized {
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode == http.StatusUnauthorized {
 				m.Log.Info("couldn't authorize bearer token")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
@@ -60,7 +62,6 @@ func (m *AuthorizationMiddleware) BuildHandler(next http.Handler) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			resp.Body.Close()
 			m.Cache.Set(bearerToken, &user, cache.DefaultExpiration)
 		} else {
 			m.Log.Infof("cache hit for %s", bearerToken)

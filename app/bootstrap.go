@@ -9,6 +9,7 @@ import (
 	"github.com/Jeff-All/Dohyo/handlers"
 	"github.com/Jeff-All/Dohyo/helpers"
 	"github.com/Jeff-All/Dohyo/middlewares"
+	"github.com/Jeff-All/Dohyo/scrapers"
 	"github.com/Jeff-All/Dohyo/services"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
@@ -22,6 +23,7 @@ import (
 var bslog = logrus.New()
 var routeHandlers = make(map[string]handlers.HandlerInterface)
 var middleware = make(map[string]middlewares.MiddlewareInterface)
+var matchScraper scrapers.MatchScraper
 var rankService services.RankService
 var rikishiService services.RikishiService
 var categoryService services.CategoryService

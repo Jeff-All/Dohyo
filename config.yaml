@@ -12,3 +12,7 @@
   authorization:
     cacheDuration: 5m
     cacheCleanup: 10m
+  scrapers:
+    match: 
+      url: "http://www.sumo.or.jp/EnHonbashoMain/torikumi_ajax"
+      host: "www.sumo.or.jp"

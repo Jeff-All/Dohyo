@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/Jeff-All/Dohyo/helpers"
+	"github.com/Jeff-All/Dohyo/scrapers"
 	"github.com/Jeff-All/Dohyo/services"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -110,4 +111,18 @@ func sql(c *cli.Context) error {
 		return err
 	}
 	return nil
+}
+
+func scrapeMatches(c *cli.Context) error {
+	if err := bootstrap(c); err != nil {
+		return err
+	}
+	if err := loadDB(); err != nil {
+		return err
+	}
+
+	scraper := scrapers.NewMatchScraper(log, viper.GetString("scrapers.match.url"), viper.GetString("scrapers.match.host"))
+	service := services.NewScraperService(log, db, scraper)
+
+	return service.ScrapeMatches(c.String("month"), c.Uint("day"))
 }

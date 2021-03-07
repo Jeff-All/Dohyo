@@ -50,6 +50,29 @@ func ExecApp() {
 				Action: run,
 			},
 			{
+				Name:  "scrape",
+				Usage: "scrapes external data",
+				Subcommands: []*cli.Command{
+					{
+						Name:   "matches",
+						Usage:  "scrapes matches from external source",
+						Action: scrapeMatches,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "month",
+								Usage:    "the expected month to be scraping",
+								Required: true,
+							},
+							&cli.UintFlag{
+								Name:     "day",
+								Usage:    "the day to scrape",
+								Required: true,
+							},
+						},
+					},
+				},
+			},
+			{
 				Name:   "sql",
 				Usage:  "execute the SQL file",
 				Action: sql,
